@@ -10,12 +10,15 @@ class CalorieTracker {
   }
 
   addMeal(meal) {
-    this._meals.push(meal);
-    this._totalCalories += meal.calories;
-    this._protein += meal.protein === undefined ? 0 : meal.protein;
-    this._fat += meal.fat === undefined ? 0 : meal.fat;
-    this._carbohydrate +=
-      meal.carbo_carbohydrate === undefined ? 0 : meal.carbo_carbohydrate;
+    if (meal instanceof Meal) {
+      this._meals.push(meal);
+      this._totalCalories += meal.calories;
+      this._protein += meal.protein ?? 0;
+      this._fat += meal.fat ?? 0;
+      this._carbohydrate += meal.carbohydrate ?? 0;
+    } else {
+      console.log('invalid meal');
+    }
   }
 
   addWorkout(workout) {
@@ -25,10 +28,13 @@ class CalorieTracker {
 }
 
 class Meal {
-  constructor(name, calories) {
+  constructor(name, calories, macros = {}) {
     this.id = Math.random().toString(16).split('.')[1];
     this.name = name;
     this.calories = calories;
+    this.protein = macros['protein'];
+    this.fat = macros['fat'];
+    this.carbohydrate = macros['carbohydrate'];
   }
 }
 
