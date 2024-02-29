@@ -33,6 +33,7 @@ class CalorieTracker {
     this._workouts.push(workout);
     this._caloriesBurned += workout.calories;
     this._calculateCaloriesConsumedAndBurned();
+    this._displayNewWorkout(workout);
     this._render();
   }
 
@@ -133,6 +134,29 @@ class CalorieTracker {
     mealsElement.appendChild(mealElement);
   }
 
+  _displayNewWorkout(workout) {
+    const workoutsElement = document.querySelector('#workout-items');
+    const workoutElement = document.createElement('div');
+    workoutElement.classList.add('card', 'my-2');
+    workoutElement.setAttribute('data-id', workout.id);
+    workoutElement.innerHTML = `
+      <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between">
+        <h4 class="mx-1">${workout.name}</h4>
+        <div
+          class="fs-1 bg-primary text-white text-center rounded-2 px-2 px-sm-5"
+        >
+          ${workout.calories}
+        </div>
+        <button class="delete btn btn-danger btn-sm mx-2">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    `;
+    workoutsElement.appendChild(workoutElement);
+  }
+
   _render() {
     this._displayCalorieBalance();
     this._displayCalorieLimit();
@@ -197,11 +221,16 @@ class App {
       const carbohydrate = document.querySelector('#carbohydrate-total');
 
       const meal = new Meal(name.value, parseInt(calories.value), {
-        protein: parseInt(protein.value),
-        fat: parseInt(fat.value),
-        carbohydrate: parseInt(carbohydrate.value),
+        protein: protein.value ? parseInt(protein.value) : 0,
+        fat: fat.value ? parseInt(fat.value) : 0,
+        carbohydrate: carbohydrate.value ? parseInt(carbohydrate.value) : 0,
       });
       this._tracker.addMeal(meal);
+
+      // Clear values
+      protein.value = '';
+      fat.value = '';
+      carbohydrate.value = '';
     } else {
       const workout = new Workout(name.value, parseInt(calories.value));
       this._tracker.addWorkout(workout);
