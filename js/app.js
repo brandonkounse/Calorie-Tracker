@@ -25,6 +25,7 @@ class CalorieTracker {
       console.log('invalid meal');
     }
     this._calculateCaloriesConsumedAndBurned();
+    this._displayNewMeal(meal);
     this._render();
   }
 
@@ -81,6 +82,21 @@ class CalorieTracker {
     }
   }
 
+  _displayTotalProtein() {
+    const proteinElement = document.querySelector('#protein');
+    proteinElement.innerHTML = this._totalProtein;
+  }
+
+  _displayTotalFat() {
+    const fatElement = document.querySelector('#fat');
+    fatElement.innerHTML = this._totalFat;
+  }
+
+  _displayTotalCarbohydrate() {
+    const carbohydrateElement = document.querySelector('#carbohydrate');
+    carbohydrateElement.innerHTML = this._totalCarbohydrate;
+  }
+
   _calculateCaloriesConsumedAndBurned() {
     this._calorieBalance = this._caloriesConsumed - this._caloriesBurned;
     this._caloriesRemaining =
@@ -94,12 +110,38 @@ class CalorieTracker {
     progressElement.style.width = `${width}%`;
   }
 
+  _displayNewMeal(meal) {
+    const mealsElement = document.querySelector('#meal-items');
+    const mealElement = document.createElement('div');
+    mealElement.classList.add('card', 'my-2');
+    mealElement.setAttribute('data-id', meal.id);
+    mealElement.innerHTML = `
+      <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between">
+        <h4 class="mx-1">${meal.name}</h4>
+        <div
+          class="fs-1 bg-primary text-white text-center rounded-2 px-2 px-sm-5"
+        >
+          ${meal.calories}
+        </div>
+        <button class="delete btn btn-danger btn-sm mx-2">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    `;
+    mealsElement.appendChild(mealElement);
+  }
+
   _render() {
     this._displayCalorieBalance();
     this._displayCalorieLimit();
     this._displayCaloriesConsumed();
     this._displayCaloriesBurned();
     this._displayCaloriesRemaining();
+    this._displayTotalProtein();
+    this._displayTotalFat();
+    this._displayTotalCarbohydrate();
     this._displayCalorieProgress();
   }
 }
@@ -144,13 +186,21 @@ class App {
 
     // Validate Inputs
     if (name.value === '' || calories.value === '') {
-      alert('Please fill in all fields');
+      alert('Please fill in name and calorie fields');
       return;
     }
 
     // Add meal or workout
     if (type === 'meal') {
-      const meal = new Meal(name.value, parseInt(calories.value));
+      const protein = document.querySelector('#protein-total');
+      const fat = document.querySelector('#fat-total');
+      const carbohydrate = document.querySelector('#carbohydrate-total');
+
+      const meal = new Meal(name.value, parseInt(calories.value), {
+        protein: parseInt(protein.value),
+        fat: parseInt(fat.value),
+        carbohydrate: parseInt(carbohydrate.value),
+      });
       this._tracker.addMeal(meal);
     } else {
       const workout = new Workout(name.value, parseInt(calories.value));
