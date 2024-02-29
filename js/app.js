@@ -58,7 +58,27 @@ class CalorieTracker {
 
   _displayCaloriesRemaining() {
     const calRemainingElement = document.querySelector('#calories-remaining');
+    const progressElement = document.querySelector('#calorie-progress');
+
     calRemainingElement.innerHTML = this._caloriesRemaining;
+
+    if (this._caloriesRemaining <= 0) {
+      calRemainingElement.parentElement.parentElement.classList.remove(
+        'bg-light'
+      );
+      calRemainingElement.parentElement.parentElement.classList.add(
+        'bg-danger'
+      );
+      progressElement.classList.remove('bg-success');
+      progressElement.classList.add('bg-danger');
+    } else {
+      calRemainingElement.parentElement.parentElement.classList.add('bg-light');
+      calRemainingElement.parentElement.parentElement.classList.remove(
+        'bg-danger'
+      );
+      progressElement.classList.add('bg-success');
+      progressElement.classList.remove('bg-danger');
+    }
   }
 
   _calculateCaloriesConsumedAndBurned() {
@@ -67,12 +87,20 @@ class CalorieTracker {
       this._calorieLimit - (this._caloriesConsumed - this._caloriesBurned);
   }
 
+  _displayCalorieProgress() {
+    const progressElement = document.querySelector('#calorie-progress');
+    const percentage = (this._calorieBalance / this._calorieLimit) * 100;
+    const width = Math.min(percentage, 100);
+    progressElement.style.width = `${width}%`;
+  }
+
   _render() {
     this._displayCalorieBalance();
     this._displayCalorieLimit();
     this._displayCaloriesConsumed();
     this._displayCaloriesBurned();
     this._displayCaloriesRemaining();
+    this._displayCalorieProgress();
   }
 }
 
