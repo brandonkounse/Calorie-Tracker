@@ -123,4 +123,49 @@ class Workout {
   }
 }
 
-const tracker = new CalorieTracker();
+class App {
+  constructor() {
+    this._tracker = new CalorieTracker();
+
+    document
+      .querySelector('#meal-form')
+      .addEventListener('submit', this._newItem.bind(this, 'meal'));
+
+    document
+      .querySelector('#workout-form')
+      .addEventListener('submit', this._newItem.bind(this, 'workout'));
+  }
+
+  _newItem(type, e) {
+    e.preventDefault();
+
+    const name = document.querySelector(`#${type}-name`);
+    const calories = document.querySelector(`#${type}-calories`);
+
+    // Validate Inputs
+    if (name.value === '' || calories.value === '') {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    // Add meal or workout
+    if (type === 'meal') {
+      const meal = new Meal(name.value, parseInt(calories.value));
+      this._tracker.addMeal(meal);
+    } else {
+      const workout = new Workout(name.value, parseInt(calories.value));
+      this._tracker.addWorkout(workout);
+    }
+
+    // Clear form
+    name.value = '';
+    calories.value = '';
+
+    const collapseItem = document.querySelector(`#collapse-${type}`);
+    const bsCollapse = new bootstrap.Collapse(collapseItem, {
+      toggle: true,
+    });
+  }
+}
+
+const app = new App();
