@@ -37,6 +37,33 @@ class CalorieTracker {
     this._render();
   }
 
+  removeMeal(id) {
+    const index = this._meals.findIndex((meal) => meal.id === id);
+
+    if (index !== -1) {
+      const meal = this._meals[index];
+      this._caloriesConsumed -= meal.calories;
+      this._totalProtein -= meal.protein;
+      this._totalFat -= meal.fat;
+      this._totalCarbohydrate -= meal.carbohydrate;
+      this._calculateCaloriesConsumedAndBurned();
+      this._meals.splice(index, 1);
+      this._render();
+    }
+  }
+
+  removeWorkout(id) {
+    const index = this._workouts.findIndex((workout) => workout.id === id);
+
+    if (index !== -1) {
+      const workout = this._workouts[index];
+      this._caloriesBurned -= workout.calories;
+      this._calculateCaloriesConsumedAndBurned();
+      this._workouts.splice(index, 1);
+      this._render();
+    }
+  }
+
   // Private Methods
   _displayCalorieLimit() {
     const calLimitElement = document.querySelector('#calories-limit');
@@ -200,6 +227,14 @@ class App {
     document
       .querySelector('#workout-form')
       .addEventListener('submit', this._newItem.bind(this, 'workout'));
+
+    document
+      .querySelector('#meal-items')
+      .addEventListener('click', this._removeItem.bind(this, 'meal'));
+
+    document
+      .querySelector('#workout-items')
+      .addEventListener('click', this._removeItem.bind(this, 'workout'));
   }
 
   _newItem(type, e) {
@@ -244,6 +279,23 @@ class App {
     const bsCollapse = new bootstrap.Collapse(collapseItem, {
       toggle: true,
     });
+  }
+
+  _removeItem(type, e) {
+    if (
+      e.target.classList.contains('delete') ||
+      e.target.classList.contains('fa-xmark')
+    ) {
+      if (confirm('Are you sure?')) {
+        const id = e.target.closest('.card').getAttribute('data-id');
+
+        type === 'meal'
+          ? this._tracker.removeMeal(id)
+          : this._tracker.removeWorkout(id);
+
+        e.target.closest('.card').remove();
+      }
+    }
   }
 }
 
