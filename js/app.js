@@ -64,6 +64,20 @@ class CalorieTracker {
     }
   }
 
+  reset() {
+    this._calorieBalance = 0;
+    this._caloriesConsumed = 0;
+    this._caloriesBurned = 0;
+    this._caloriesRemaining = this._calorieLimit;
+    this._meals = [];
+    this._workouts = [];
+    this._totalProtein = 0;
+    this._totalFat = 0;
+    this._totalCarbohydrate = 0;
+
+    this._render();
+  }
+
   // Private Methods
   _displayCalorieLimit() {
     const calLimitElement = document.querySelector('#calories-limit');
@@ -243,6 +257,10 @@ class App {
     document
       .querySelector('#filter-workouts')
       .addEventListener('keyup', this._filterItems.bind(this, 'workout'));
+
+    document
+      .querySelector('#reset')
+      .addEventListener('click', this._reset.bind(this));
   }
 
   _newItem(type, e) {
@@ -317,6 +335,16 @@ class App {
         item.style.display = 'none';
       }
     });
+  }
+
+  _reset() {
+    if (confirm('Are you sure you want to clear all data?')) {
+      this._tracker.reset();
+      document.querySelector('#meal-items').innerHTML = '';
+      document.querySelector('#workout-items').innerHTML = '';
+      document.querySelector('#filter-meals').value = '';
+      document.querySelector('#filter-workouts').value = '';
+    }
   }
 }
 
