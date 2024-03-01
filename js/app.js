@@ -4,12 +4,12 @@ class CalorieTracker {
     this._calorieBalance = Storage.getTotalCalories();
     this._caloriesConsumed = Storage.getCaloriesConsumed();
     this._caloriesBurned = Storage.getCaloriesBurned();
-    this._caloriesRemaining = this._calorieLimit;
+    this._caloriesRemaining = this._calorieLimit - this._calorieBalance;
     this._meals = Storage.getMeals();
     this._workouts = Storage.getWorkouts();
-    this._totalProtein = 0;
-    this._totalFat = 0;
-    this._totalCarbohydrate = 0;
+    this._totalProtein = Storage.getProtein();
+    this._totalFat = Storage.getFat();
+    this._totalCarbohydrate = Storage.getCarbohydrate();
 
     this._render();
   }
@@ -17,11 +17,16 @@ class CalorieTracker {
   addMeal(meal) {
     if (meal instanceof Meal) {
       Storage.saveMeal(meal);
-      Storage.updateCaloriesConsumed(meal.calories);
-      this._caloriesConsumed = Storage.getCaloriesConsumed();
+      this._caloriesConsumed += meal.calories;
+      Storage.updateCaloriesConsumed(this._caloriesConsumed);
       this._totalProtein += meal.protein ?? 0;
       this._totalFat += meal.fat ?? 0;
       this._totalCarbohydrate += meal.carbohydrate ?? 0;
+      Storage.saveMacros(
+        this._totalProtein,
+        this._totalFat,
+        this._totalCarbohydrate
+      );
     } else {
       console.log('invalid meal');
     }
@@ -32,8 +37,8 @@ class CalorieTracker {
 
   addWorkout(workout) {
     Storage.saveWorkout(workout);
-    Storage.updateCaloriesBurned(workout.calories);
-    this._caloriesBurned = Storage.getCaloriesBurned();
+    this._caloriesBurned += workout.calories;
+    Storage.updateCaloriesBurned(this._caloriesBurned);
     this._calculateCaloriesConsumedAndBurned();
     this._displayNewWorkout(workout);
     this._render();
@@ -298,6 +303,42 @@ class Storage {
       meals = JSON.parse(localStorage.getItem('meals'));
     }
     return meals;
+  }
+
+  static saveMacros(protein, fat, carbohydrate) {
+    localStorage.setItem('protein', protein);
+    localStorage.setItem('fat', fat);
+    localStorage.setItem('carbohydrate', carbohydrate);
+  }
+
+  static getProtein() {
+    let protein;
+    if (localStorage.getItem('protein') === null) {
+      protein = 0;
+    } else {
+      protein = parseInt(localStorage.getItem('protein'));
+    }
+    return protein;
+  }
+
+  static getFat() {
+    let fat;
+    if (localStorage.getItem('fat') === null) {
+      fat = 0;
+    } else {
+      fat = parseInt(localStorage.getItem('fat'));
+    }
+    return fat;
+  }
+
+  static getCarbohydrate() {
+    let carbohydrate;
+    if (localStorage.getItem('carbohydrate') === null) {
+      carbohydrate = 0;
+    } else {
+      carbohydrate = parseInt(localStorage.getItem('carbohydrate'));
+    }
+    return carbohydrate;
   }
 
   static getWorkouts() {
